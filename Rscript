@@ -1,13 +1,14 @@
-# Project for Applied Statistics Course
+# ---------------------------------------------------------------------------------
+#Project for Applied Statistics Course
 # Author: Theodor Nowicki
 # Finish date: 5.04.2022
-
+# ---------------------------------------------------------------------------------
 # Dataset used:
 # Replication Data for: "The development of the Screening of Visual Complaints 
 # questionnaire for patients with neurodegenerative disorders: evaluation of 
 # psychometric features in a community sample"
 # Retrieved from https://dataverse.nl/dataset.xhtml?persistentId=doi:10.34894/CMJXAK
-
+# ----------------------------------------------------------------------------------
 
 library(foreign)
 library(tidyverse)
