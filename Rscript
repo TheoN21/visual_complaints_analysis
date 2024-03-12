@@ -40,17 +40,9 @@ dataTN <- sample_n(df, 400)
 
 
 # Make sure categorical variables are factors
-str(dataTN$Education_3levels) 
-str(dataTN$Sex)               
-str(dataTN$Education)         
-str(dataTN$Neurologist)       
-str(dataTN$Psychiatrist)      
+str(dataTN)   
 
 # Other variables into numeric
-str(dataTN$BRIEF_total)  
-str(dataTN$DASS_total)  
-str(dataTN$SVK_total)  
-
 dataTN$BRIEF_total <- as.numeric(dataTN$BRIEF_total)
 dataTN$DASS_total <- as.numeric(dataTN$DASS_total)
 dataTN$SVK_Total <- as.numeric(dataTN$SVK_Total)
