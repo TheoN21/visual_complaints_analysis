@@ -29,50 +29,34 @@ data_total <- read.csv("Data_total.csv",
 
 
 # Creating a new data frame with only the relevant variables
-df <- subset(data_total, select = c(Age, Sex, Education, Education_3levels, 
+df <- subset(data_total, select = c(Age, Sex, Education_3levels, 
                                     Neurologist, Psychiatrist, BRIEF_total, 
-                                    DASS_total, SVK_Total, CVS_Total, FEDA_total
-                                    ,USER1, USER3))
+                                    DASS_total, SVK_Total))
 
 # Selecting a subset of participants
 set.seed(7)
 dataTN <- sample_n(df, 400)
 
 
-# Make sure categorical variables are factors
+# Check datatypes
 str(dataTN)   
 
-# Other variables into numeric
-dataTN$BRIEF_total <- as.numeric(dataTN$BRIEF_total)
-dataTN$DASS_total <- as.numeric(dataTN$DASS_total)
-dataTN$SVK_Total <- as.numeric(dataTN$SVK_Total)
-dataTN$Age <- as.numeric(dataTN$Age)
+# Add categorical variables as factors and numeric, others only as numeric
+dataTN <- dataTN %>%
+  mutate(Sex_num = as.numeric(Sex) , Neu_num = as.numeric(Neurologist), Psy_num = as.numeric(Psychiatrist), 
+         Edu_num = as.numeric(Education_3levels),BRIEF = as.numeric(BRIEF_total),DASS = as.numeric(DASS_total),SVK = as.numeric(SVK_Total), 
+         Age = as.numeric(Age)) 
 
+dataTN <- dataTN %>%
+  mutate(Eduf = factor(Edu_num, labels= c("low","medium","high")), 
+         Sexf = factor(Sex, labels= c("male","female")),Neuf = factor(Neurologist, labels= c("no","yes")), 
+         Psyf = factor(Psychiatrist, labels= c("no","yes"))) 
 
-dataTN$Education_3levels <- as.numeric(dataTN$Education_3levels)
-dataTN$Education <- as.numeric(dataTN$Education)
-
-dataTN$Education_3levels <- factor(dataTN$Education_3levels, labels= c("low","medium","high"))
-dataTN$Sex <- factor(dataTN$Sex, labels= c("male","female"))
-dataTN$Neurologist <- factor(dataTN$Neurologist, labels= c("no","yes"))
-dataTN$Psychiatrist <- factor(dataTN$Psychiatrist, labels= c("no","yes"))
-
-
-# Delete variables that are not gonna be needed
-reduced_dataTN <- dataTN %>%
-  select(-Education,-CVS_Total,-FEDA_total,-USER1,-USER3,)
-
-# Add categorical variables as factors and numeric:
-dataTN <- reduced_dataTN %>%
-  mutate(Sex_num = as.numeric(Sex) ,Edu_num = as.numeric(Education_3levels), 
-         Neu_num = as.numeric(Neurologist),
-         Psy_num = as.numeric(Psychiatrist))
-
-# Create shorter names
-dataTN <- rename(dataTN,c(Sexf = Sex, Eduf = Education_3levels , 
-                          Neuf = Neurologist, Psyf = Psychiatrist , 
-                          BRIEF = BRIEF_total , DASS = DASS_total , 
-                          SVK = SVK_Total ))
+# Delete wrong datatype variables
+dataTN <- dataTN %>%
+  select(-Sex, -Education_3levels, 
+         -Neurologist, -Psychiatrist, -BRIEF_total, 
+         -DASS_total, -SVK_Total)
 
 # Save dataset
 save(dataTN, file = "dataTN.Rdata")
@@ -215,7 +199,6 @@ pie(table(dataTN$na_BRIEF))
 pie(table(dataTN$na_Edu))
 pie(table(dataTN$na_DASS))
 
-
 # Winsorized variance and mean
 # Download from: http://dornsife.usc.edu/labs/rwilcox/software/
 source("Rallfun-v39.txt")
@@ -264,7 +247,6 @@ sd(dataTN$SVK,na.rm= T)
 mean(dataTN$Edu_num, na.rm= T)
 median(dataTN$Edu_num,na.rm= T)
 sd(dataTN$Edu_num,na.rm= T)
-
 
 # Difference between robust measures and non-robust measures small
 # Graphs of continuous variables
