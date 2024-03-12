@@ -65,15 +65,14 @@ reduced_dataTN <- dataTN %>%
 # Add categorical variables as factors and numeric:
 dataTN <- reduced_dataTN %>%
   mutate(Sex_num = as.numeric(Sex) ,Edu_num = as.numeric(Education_3levels), 
-         Neurologist_num = as.numeric(Neurologist),
-         Psychiatrist_num = as.numeric(Psychiatrist))
+         Neu_num = as.numeric(Neurologist),
+         Psy_num = as.numeric(Psychiatrist))
 
 # Create shorter names
 dataTN <- rename(dataTN,c(Sexf = Sex, Eduf = Education_3levels , 
                           Neuf = Neurologist, Psyf = Psychiatrist , 
                           BRIEF = BRIEF_total , DASS = DASS_total , 
-                          SVK = SVK_Total , Neu_num = Neurologist_num, 
-                          Psy_num = Psychiatrist_num))
+                          SVK = SVK_Total ))
 
 # Save dataset
 save(dataTN, file = "dataTN.Rdata")
