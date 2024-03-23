@@ -102,9 +102,9 @@ mean(is.na(dataTN$SVK))
 
 # Are NA correlated with a control variable?
 # Create a variable indicating NA or not
-dataTN$na_Edu <- as.numeric(is.na(dataTN$Edu_num))
-dataTN$na_BRIEF <- as.numeric(is.na(dataTN$BRIEF))
-dataTN$na_DASS <- as.numeric(is.na(dataTN$DASS))
+dataTN <- dataTN %>%
+  mutate(na_Edu = as.numeric(is.na(Edu_num), 
+         na_BRIEF = as.numeric(is.na(BRIEF),na_DASS = as.numeric(is.na(DASS)) 
 
 # Check pattern of NA regarding control variable
 # First check visually
