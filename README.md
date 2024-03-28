@@ -31,9 +31,9 @@ The purpose of this project is to examine the role of visual complaints as a mod
 
 ## Data
 ### Source Data
-The data was taken from the study by [Huizinga et al. (2020)](https://pubmed.ncbi.nlm.nih.gov/32348342/). The study is a cross-sectional online questionnaire study to validate the Screening of Visual Complaints questionnaire in healthy Dutch participants. The sample was a convenience sample. All participants volunteered to participate and filled out the same questionnaires for the study. 
+The data was taken from the study by [Huizinga et al. (2020)](https://pubmed.ncbi.nlm.nih.gov/32348342/). The study is a cross-sectional online questionnaire study to validate the Screening of Visual Complaints questionnaire in healthy Dutch participants. The sample was a convenience sample. All participants volunteered to participate and filled out the same questionnaires for the study. Retrieved [from](https://dataverse.nl/dataset.xhtml?persistentId=doi:10.34894/CMJXAK)
 
-Original data [Data_total.csv](https://dataverse.nl/dataset.xhtml?persistentId=doi:10.34894/CMJXAK)
+Original data [Data_total.csv](https://github.com/TheoN21/visual_complaints_moderation/blob/main/data/Data_total.csv)
 
 ### Data Preprocessing
 - Variable selection
@@ -41,7 +41,21 @@ Original data [Data_total.csv](https://dataverse.nl/dataset.xhtml?persistentId=d
 - Assessing missing data
 - Checking for outliers
   
-Cleaned data [dataTN](https://github.com/TheoN21/visual_complaints_moderation/blob/main/dataTN.Rdata)
+Cleaned data [dataTN](https://github.com/TheoN21/visual_complaints_moderation/blob/main/data/dataTN.Rdata)
+
+## Code structure
+Explain the code structure and how it is organized, including any significant files and their purposes. This will help others understand how to navigate your project and find specific components.
+
+## Results and evaluation
+
+Provide an overview of the results of your project, including any relevant metrics and graphs. Include explanations of any evaluation methodologies and how they were used to assess the quality of the model. You can also make it appealing by including any pictures of your analysis or visualizations.
+
+PDF of my [report]()
+
+## Future work
+
+Outline potential future work that can be done to extend the project or improve its functionality. This will help others understand the scope of your project and identify areas where they can contribute.
+
 
 ## Getting Started
 
