@@ -60,18 +60,26 @@ dataTN <- dataTN %>%
 
 # Save dataset
 save(dataTN, file = "dataTN.Rdata")
+rm(data_total,df)
 
 # Descriptive analysis
 str(dataTN)
 summary(dataTN)
-barplot(table(dataTN$Age))  
+  
 pie(table(dataTN$Sexf))    
 pie(table(dataTN$Eduf))     
 pie(table(dataTN$Neuf))     
-pie(table(dataTN$Psyf))     
-barplot(table(dataTN$BRIEF))  
-barplot(table(dataTN$DASS))   
-barplot(table(dataTN$SVK))    
+pie(table(dataTN$Psyf))
+
+hist(table(dataTN$Age),main = 'Age', xlab = 'Age')
+hist(table(dataTN$BRIEF), main = 'BRIEF',xlab = 'BRIEF', ylab = 'Frequency', col = 'lightblue',axisnames =  TRUE)  
+hist(table(dataTN$DASS),main = 'DASS',xlab = 'DASS', ylab = 'Frequency', col = 'orangered' ,axisnames =  TRUE)   
+hist(table(dataTN$SVK),main = 'SVC',xlab = 'SVC', ylab = 'Frequency', col = 'lightgreen',axisnames =  TRUE )    
+
+boxplot(dataTN$Age)
+boxplot(dataTN$BRIEF)
+boxplot(dataTN$DASS)
+boxplot(dataTN$SVK)
 
 # Download Wilcox's functions from: https://rdrr.io/rforge/WRS/man/out.html
 source(file.choose())
@@ -103,8 +111,8 @@ mean(is.na(dataTN$SVK))
 # Are NA correlated with a control variable?
 # Create a variable indicating NA or not
 dataTN <- dataTN %>%
-  mutate(na_Edu = as.numeric(is.na(Edu_num), 
-         na_BRIEF = as.numeric(is.na(BRIEF),na_DASS = as.numeric(is.na(DASS)) 
+  mutate(na_Edu = as.numeric(is.na(Edu_num)), 
+         na_BRIEF = as.numeric(is.na(BRIEF)),na_DASS = as.numeric(is.na(DASS))) 
 
 # Check pattern of NA regarding control variable
 # First check visually
@@ -249,21 +257,7 @@ median(dataTN$Edu_num,na.rm= T)
 sd(dataTN$Edu_num,na.rm= T)
 
 # Difference between robust measures and non-robust measures small
-# Graphs of continuous variables
-boxplot(dataTN$Age)
-boxplot(dataTN$BRIEF)
-boxplot(dataTN$DASS)
-boxplot(dataTN$SVK)
 
-hist(dataTN$Age, xlab = 'Age')
-hist(dataTN$BRIEF,main = 'BRIEF', xlab = 'BRIEF',)
-hist(dataTN$DASS, main = 'DASS' ,xlab= 'DASS')
-hist(dataTN$SVK, main = 'SVC', xlab = 'SVC')
-
-barplot(table(dataTN$Age, ))
-barplot(table(dataTN$BRIEF))
-barplot(table(dataTN$DASS, xlab= 'DASS'))
-barplot(table(dataTN$SVK, xlab = 'SVK'))
 
 # Simple bivariate analysis
 # Correlations continuous variables
@@ -366,13 +360,14 @@ abline(0,0)
 vif(model1)
 
 # Retry model with centered predictors
-model2 <- lm(DASS~cBRIEF+ cSVK+cINTERACTION+Sex_num+Edu_num+Neu_num+Psy_num+Age,dataTN)
+model2 <- lm(DASS~cBRIEF+ cSVK+cINTERACTION+Sex_num+Edu_num+Neu_num+Psy_num+Age, dataTN)
 summary(model2)
 vif(model2)
 
 # Check linearity
 crPlots(model1)
 crPlots(model2)
+
 
 # Check influential observations
 summary(influence.measures(model2))
@@ -381,12 +376,12 @@ summary(influence.measures(model2))
 ress<-rstandard(model1)            
 hist(ress,main="Histogram")
 qqnorm(ress)
-qqline(ress)
+qqline(ress, col= 'red')
 
-ress<-rstandard(model2)            
+ress<-rstandard(model2)   
 hist(ress,main="Histogram")
 qqnorm(ress)
-qqline(ress)
+qqline(ress, col= 'red')
 
 # Conduct Logistic regression analysis
 # Transform DASS into dichotomous variable and perform logistic regression
@@ -406,32 +401,47 @@ summary(clogmodel)
 vif(clogmodel) 
 
 # Check linearity
-# Create interactions of continuous predictors with its log
-dataTN$logcBRIEF <- log(dataTN$cBRIEF)*dataTN$cBRIEF
-dataTN$logBRIEF <- log(dataTN$BRIEF+1)*(dataTN$BRIEF+1)
-dataTN$logSVK <- log(dataTN$SVK+1)*(dataTN$SVK+1)
-dataTN$logintera <- log((dataTN$SVK*dataTN$BRIEF)+1)*((dataTN$SVK*dataTN$BRIEF)+1)
+dataTN <- dataTN %>%
+ mutate(interaction = BRIEF*SVK)
 
-linealog <- glm(dass~BRIEF+ SVK+BRIEF*SVK+Sex_num+Edu_num+Neu_num+Psy_num+ Age +logSVK+logBRIEF+logintera,data =dataTN,family = binomial)
-summary(linealog)
+logmodel <- glm(dass~BRIEF+ SVK+interaction +Sex_num+Edu_num+Neu_num+Psy_num+ Age,data =dataTN,family = binomial, na.action = na.exclude)
+summary(logmodel)
 
-# Check linearity graphically
-# Add predicted values from the model
-probabilities <- predict(clogmodel, type = "response")
+# Create component + residual plot
+dataTN %>%
+  mutate(comp_res = coef(logmodel)["BRIEF"]*BRIEF + residuals(logmodel, type = "working")) |> 
+  ggplot(aes(x = BRIEF, y = comp_res)) +
+  geom_point() +
+  geom_smooth(color = "red", method = "lm", linetype = 2, se = F) +
+  geom_smooth(se = F)+
+  labs(y= "Component plus residual", x = "BRIEF")
 
-# Create a data-frame without NA values, select the numeric continuous variables to plot
-nonadataTN <- dataTN %>% 
-  na.omit(dataTN)%>% 
-  select(Age,cBRIEF,cSVK,cINTERACTION)
 
-predictors <- colnames(nonadataTN)
+dataTN %>%
+  mutate(comp_res = coef(logmodel)["SVK"]*SVK + residuals(logmodel, type = "working")) |> 
+  ggplot(aes(x = SVK, y = comp_res)) +
+  geom_point() +
+  geom_smooth(color = "red", method = "lm", linetype = 2, se = F) +
+  geom_smooth(se = F) +
+  labs(y= "Component plus residual", x = "SVC")
 
-# Gather the predicted values across the predictor variables
-logit = log(probabilities/(1-probabilities))
 
-# Plot the logit values across predictor variables
-plot(logit,dataTN$BRIEF, ylab = 'BRIEF')
-plot(logit,dataTN$SVK, ylab = 'SVC')
+dataTN %>%
+  mutate(comp_res = coef(logmodel)["interaction"]*(interaction) + residuals(logmodel, type = "working")) |> 
+  ggplot(aes(x = interaction, y = comp_res)) +
+  geom_point() +
+  geom_smooth(color = "red", method = "lm", linetype = 2, se = F) +
+  geom_smooth(se = F)+
+  labs(y= "Component plus residual", x = "Interaction")
+
+dataTN %>% 
+  mutate(comp_res = coef(logmodel)["Age"]*Age + residuals(logmodel, type = "working")) |> 
+  ggplot(aes(x = Age, y = comp_res)) +
+  geom_point() +
+  geom_smooth(color = "red", method = "lm", linetype = 2, se = F) +
+  geom_smooth(se = F)+
+  labs(y= "Component plus residual", x = "Age")
+
 
 # Check influential observations
 summary(influence.measures(clogmodel))
