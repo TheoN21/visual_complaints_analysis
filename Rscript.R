@@ -1,0 +1,468 @@
+# ---------------------------------------------------------------------------------
+#Project for Applied Statistics Course
+# Author: Theodor Nowicki
+# Finish date: 5.04.2022
+# ---------------------------------------------------------------------------------
+# Dataset used:
+# Replication Data for: "The development of the Screening of Visual Complaints 
+# questionnaire for patients with neurodegenerative disorders: evaluation of 
+# psychometric features in a community sample"
+# Retrieved from https://dataverse.nl/dataset.xhtml?persistentId=doi:10.34894/CMJXAK
+# ----------------------------------------------------------------------------------
+
+library(foreign)
+library(tidyverse)
+library(tidyselect)
+library(car)
+library(ggpubr)
+library(rcompanion)
+library(psych)
+library(faraway)
+library(broom)
+library(pwr)
+
+
+# Reading in the data
+data_total <- read.csv("Data_total.csv", 
+                       header = TRUE, 
+                       sep = ";")
+
+
+# Creating a new data frame with only the relevant variables
+df <- subset(data_total, select = c(Age, Sex, Education_3levels, 
+                                    Neurologist, Psychiatrist, BRIEF_total, 
+                                    DASS_total, SVK_Total))
+
+# Selecting a subset of participants
+set.seed(7)
+dataTN <- sample_n(df, 400)
+
+
+# Check datatypes
+str(dataTN)   
+
+# Add categorical variables as factors and numeric, others only as numeric
+dataTN <- dataTN %>%
+  mutate(Sex_num = as.numeric(Sex) , Neu_num = as.numeric(Neurologist), Psy_num = as.numeric(Psychiatrist), 
+         Edu_num = as.numeric(Education_3levels),BRIEF = as.numeric(BRIEF_total),DASS = as.numeric(DASS_total),SVK = as.numeric(SVK_Total), 
+         Age = as.numeric(Age)) 
+
+dataTN <- dataTN %>%
+  mutate(Eduf = factor(Edu_num, labels= c("low","medium","high")), 
+         Sexf = factor(Sex, labels= c("male","female")),Neuf = factor(Neurologist, labels= c("no","yes")), 
+         Psyf = factor(Psychiatrist, labels= c("no","yes"))) 
+
+# Delete wrong datatype variables
+dataTN <- dataTN %>%
+  select(-Sex, -Education_3levels, 
+         -Neurologist, -Psychiatrist, -BRIEF_total, 
+         -DASS_total, -SVK_Total)
+
+# Save dataset
+save(dataTN, file = "dataTN.Rdata")
+
+# Descriptive analysis
+str(dataTN)
+summary(dataTN)
+barplot(table(dataTN$Age))  
+pie(table(dataTN$Sexf))    
+pie(table(dataTN$Eduf))     
+pie(table(dataTN$Neuf))     
+pie(table(dataTN$Psyf))     
+barplot(table(dataTN$BRIEF))  
+barplot(table(dataTN$DASS))   
+barplot(table(dataTN$SVK))    
+
+# Download Wilcox's functions from: https://rdrr.io/rforge/WRS/man/out.html
+source(file.choose())
+
+# Check for outliers according to wilcox
+out(dataTN$Age)      
+out(dataTN$BRIEF)       
+out(dataTN$DASS)      
+out(dataTN$SVK)     
+
+# Check for NA
+sum(is.na(dataTN$Age)) 
+sum(is.na(dataTN$Sex_num))  
+sum(is.na(dataTN$Edu_num))               
+sum(is.na(dataTN$Neu_num))      
+sum(is.na(dataTN$Psy_num)) 
+sum(is.na(dataTN$BRIEF))       
+sum(is.na(dataTN$DASS))       
+sum(is.na(dataTN$SVK))   
+mean(is.na(dataTN$Age)) 
+mean(is.na(dataTN$Sex_num)) 
+mean(is.na(dataTN$Edu_num)) 
+mean(is.na(dataTN$Neu_num)) 
+mean(is.na(dataTN$Psy_num)) 
+mean(is.na(dataTN$BRIEF))  
+mean(is.na(dataTN$DASS))   
+mean(is.na(dataTN$SVK))    
+
+# Are NA correlated with a control variable?
+# Create a variable indicating NA or not
+dataTN <- dataTN %>%
+  mutate(na_Edu = as.numeric(is.na(Edu_num), 
+         na_BRIEF = as.numeric(is.na(BRIEF),na_DASS = as.numeric(is.na(DASS)) 
+
+# Check pattern of NA regarding control variable
+# First check visually
+ggboxplot(dataTN, x = "na_BRIEF", y = "Age", 
+          color = "na_BRIEF", palette = c("#00AFBB", "#E7B800"),
+          ylab = "Age", xlab = "NA")
+ggboxplot(dataTN, x = "na_DASS", y = "Age", 
+          color = "na_DASS", palette = c("#00AFBB", "#E7B800"),
+          ylab = "Age", xlab = "NA")
+agewtest <- wilcox.test(Age ~ na_DASS, data = dataTN,
+                        exact = FALSE)
+wilcoxonR(x = dataTN$Age, g= dataTN$na_DASS,ci=TRUE,conf=0.95,type='perc')
+
+# Look at frequencies and conduct Chi-square test 
+freqnaBRIEFsex <- dataTN %>%
+     select(na_BRIEF,Sexf) %>%    
+     count(na_BRIEF, Sexf) %>%
+     spread(Sexf,n) 
+
+freqnaDASSsex <- dataTN %>%
+  select(na_DASS, Sexf) %>%    
+  count(na_DASS, Sexf) %>%
+  spread(Sexf,n)
+
+freqnaBRIEFedu <- dataTN %>%
+  select(na_BRIEF, Eduf) %>%    
+  count(na_BRIEF, Eduf) %>%
+  spread(Eduf,n)
+Briefedu <- freqnaBRIEFedu [,c(2:4)] 
+
+freqnaDASSedu <- dataTN %>%
+  select(na_DASS,Eduf) %>%  
+  count(na_DASS, Eduf) %>%
+  spread(Eduf,n)
+Dassedu <- freqnaDASSedu[,c(2:4)]
+
+BRIEFneu <- dataTN %>%
+  select(na_BRIEF,Neuf) %>%    
+  count(na_BRIEF, Neuf) %>%
+  spread(Neuf,n)
+Briefneu <- BRIEFneu[,c(2,3)]
+
+DASSneu <- dataTN %>%
+  select(na_DASS, Neuf) %>%       
+  count(na_DASS, Neuf) %>%
+  spread(Neuf,n)
+Dassneu <- DASSneu[,c(2,3)]
+
+BRIEFpsy <- dataTN %>%
+  select(na_BRIEF,Psyf) %>%    
+  count(na_BRIEF, Psyf) %>%
+  spread(Psyf,n)
+Briefpsy <- BRIEFpsy[,c(2,3)]
+
+DASSpsy <- dataTN %>%
+  select(na_DASS, Psyf) %>%       
+  count(na_DASS, Psyf) %>%
+  spread(Psyf,n)
+Dasspsy <- DASSpsy[,c(2,3)]
+
+# Conduct Chi-square tests  
+# H0 the categorical variable and the missingness indicator are not significantly correlated with each other
+# HA the categorical variable and the missingness indicator are significantly correlated with each other
+chi1 <- chisq.test(Briefedu)    
+print(chi1)
+chi2 <- chisq.test(Dassedu)     
+print(chi2)
+chi3 <- chisq.test(Briefneu)          
+print(chi3)
+chi4 <- chisq.test(Dassneu)         
+print(chi4)
+chi5 <- chisq.test(Briefpsy)         
+print(chi5)
+chi6 <- chisq.test(Dasspsy)          
+print(chi6)
+
+# Correlate with NA
+NADASSBRIEF <- dataTN %>%
+  select(na_BRIEF,na_DASS) %>%    
+  count(na_BRIEF, na_DASS) %>% 
+  spread(na_BRIEF,n, fill = 0)
+NADassBrief <- NADASSBRIEF[,c(2,3)]
+
+# Conduct Chi-square test
+chi7 <- chisq.test(NADassBrief)          
+print(chi7)
+
+# Calculate effect size for test
+wsqr = Xsqr/N
+w = sqrt(333.79/400)
+pie(table(dataTN$na_BRIEF))
+pie(table(dataTN$na_Edu))
+pie(table(dataTN$na_DASS))
+
+# Winsorized variance and mean
+# Download from: http://dornsife.usc.edu/labs/rwilcox/software/
+source("Rallfun-v39.txt")
+winmean(dataTN$Age,na.rm = TRUE)
+winvar(dataTN$Age,tr = 0.2,na.rm = TRUE)
+
+winmean(dataTN$BRIEF,na.rm = T)
+winvar(dataTN$BRIEF,na.rm = T)
+
+winmean(dataTN$DASS,na.rm = T)
+winvar(dataTN$DASS,na.rm = T)
+
+winmean(dataTN$SVK,na.rm = T)
+winvar(dataTN$SVK,na.rm = T)
+
+# Trimmed means and median
+mean(dataTN$Age,trim= 0.1, na.rm= T)    
+mad(dataTN$Age,na.rm= T)
+
+mean(dataTN$BRIEF,trim= 0.1, na.rm= T)    
+mad(dataTN$BRIEF, na.rm= T)
+
+mean(dataTN$DASS,trim= 0.1, na.rm= T)
+mad(dataTN$DASS,na.rm= T)
+
+mean(dataTN$SVK,trim= 0.1, na.rm= T)
+mad(dataTN$SVK,na.rm= T)
+
+# Non-robust measures
+mean(dataTN$Age, na.rm= T)    
+median(dataTN$Age,na.rm= T)
+sd(dataTN$Age, na.rm= T)
+
+mean(dataTN$BRIEF,na.rm= T)    
+median(dataTN$BRIEF,na.rm= T)
+sd(dataTN$BRIEF,na.rm= T)
+
+mean(dataTN$DASS, na.rm= T)
+median(dataTN$DASS,na.rm= T)
+sd(dataTN$DASS,na.rm= T)
+
+mean(dataTN$SVK, na.rm= T)
+median(dataTN$SVK,na.rm= T)
+sd(dataTN$SVK,na.rm= T)
+
+mean(dataTN$Edu_num, na.rm= T)
+median(dataTN$Edu_num,na.rm= T)
+sd(dataTN$Edu_num,na.rm= T)
+
+# Difference between robust measures and non-robust measures small
+# Graphs of continuous variables
+boxplot(dataTN$Age)
+boxplot(dataTN$BRIEF)
+boxplot(dataTN$DASS)
+boxplot(dataTN$SVK)
+
+hist(dataTN$Age, xlab = 'Age')
+hist(dataTN$BRIEF,main = 'BRIEF', xlab = 'BRIEF',)
+hist(dataTN$DASS, main = 'DASS' ,xlab= 'DASS')
+hist(dataTN$SVK, main = 'SVC', xlab = 'SVC')
+
+barplot(table(dataTN$Age, ))
+barplot(table(dataTN$BRIEF))
+barplot(table(dataTN$DASS, xlab= 'DASS'))
+barplot(table(dataTN$SVK, xlab = 'SVK'))
+
+# Simple bivariate analysis
+# Correlations continuous variables
+cor(dataTN$DASS,dataTN$BRIEF, 'pairwise.complete.obs')  
+cor(dataTN$DASS,dataTN$SVK, 'pairwise.complete.obs')   
+cor(dataTN$SVK,dataTN$BRIEF, 'pairwise.complete.obs')   
+cor(dataTN$Age,dataTN$BRIEF, 'pairwise.complete.obs')   
+cor(dataTN$Age,dataTN$SVK, 'pairwise.complete.obs')     
+
+# Bivariate analysis categorical with continuous variables
+# First check visually
+ggboxplot(dataTN, x = "Sexf", y = "BRIEF", 
+          color = "Sexf", palette = c("#00AFBB", "#E7B800"),
+          ylab = "EF", xlab = "Sex")
+
+ggboxplot(dataTN, x = "Sexf", y = "SVK", 
+          color = "Sexf", palette = c("#00AFBB", "#E7B800"),
+          ylab = "Visual complains", xlab = "Sex")
+
+ggboxplot(dataTN, x = "Neuf", y = "BRIEF", 
+          color = "Neuf", palette = c("#00AFBB", "#E7B800"),
+          ylab = "EF", xlab = "Neurologist")
+
+ggboxplot(dataTN, x = "Neuf", y = "SVK", 
+          color = "Neuf", palette = c("#00AFBB", "#E7B800"),
+          ylab = "visual complains", xlab = "Neurologist")          
+
+ggboxplot(dataTN, x = "Psyf", y = "BRIEF", 
+          color = "Psyf", palette = c("#00AFBB", "#E7B800"),    
+          ylab = "EF", xlab = "Psychologist")                     
+
+ggboxplot(dataTN, x = "Psyf", y = "SVK", 
+          color = "Psyf", palette = c("#00AFBB", "#E7B800"),    
+          ylab = "Visual complaints", xlab = "Psychologist")       
+
+ggboxplot(dataTN, x = "Psyf", y = "DASS", 
+          color = "Psyf", palette = c("#00AFBB", "#E7B800"),    
+          ylab = "Depression and Anxiety", xlab = "Psychologist") 
+
+# Conduct Wilcoxon rank sum test
+Wtest1 <- wilcox.test(SVK ~ Neuf, data = dataTN,
+                   exact = FALSE)
+Wtest1 
+Wtest2<- wilcox.test( SVK ~ Psyf, data = dataTN,
+                     exact = FALSE)
+Wtest2 
+Wtest3<- wilcox.test( BRIEF ~ Psyf, data = dataTN,
+                      exact = FALSE)
+Wtest3 
+Wtest4<- wilcox.test( DASS ~ Psyf, data = dataTN,
+                      exact = FALSE)
+Wtest4 
+
+# Calculate effect sizes
+wilcoxonR(x = dataTN$SVK, g= dataTN$Neuf,ci=TRUE,conf=0.95,type='perc')
+wilcoxonR(x = dataTN$SVK, g= dataTN$Psyf,ci=TRUE,conf=0.95,type='perc')
+wilcoxonR(x = dataTN$BRIEF, g= dataTN$Psyf,ci=TRUE,conf=0.95,type='perc')
+wilcoxonR(x = dataTN$DASS, g= dataTN$Psyf,ci=TRUE,conf=0.95,type='perc')
+
+# Conduct t-tests and CIs
+table(dataTN$Neuf)
+table(dataTN$Psyf)
+t.test(dataTN$SVK~ dataTN$Neuf,conf.level = 0.95)
+t.test(dataTN$SVK~ dataTN$Psyf,conf.level = 0.95)
+t.test(dataTN$BRIEF~dataTN$Psyf,conf.level = 0.95)        
+t.test(dataTN$DASS~ dataTN$Psyf,conf.level = 0.95)  
+
+d1 <- cohen.d(dataTN$SVK,dataTN$Neuf)
+d1
+dci1 <- d.ci(0.23,n1=300,n2=100)
+dci1
+d2 <- cohen.d(dataTN$SVK,dataTN$Psyf)
+d2
+dci2 <- d.ci(0.19,n1=276,n2=124)
+dci2
+d3 <- cohen.d(dataTN$BRIEF,dataTN$Psyf)
+d3
+dci3 <- d.ci(0.39,n1=276,n2=124)
+dci3
+d4 <- cohen.d(dataTN$DASS,dataTN$Psyf)
+d4
+dci4 <- d.ci(0.36,n1=276,n2=124)
+dci4
+
+# Center predictors
+dataTN$cBRIEF<- scale(dataTN$BRIEF,scale = FALSE)
+dataTN$cSVK<- scale(dataTN$SVK,scale = FALSE)
+dataTN$cINTERACTION <- dataTN$cSVK*dataTN$cBRIEF
+
+# Diagnostics for multiple regression model
+# Check homoscedasticity
+model1 <- lm(DASS~BRIEF+ SVK+BRIEF*SVK+Sex_num+Edu_num+Neu_num+Psy_num+Age,dataTN)
+summary(model1)
+yhat<-fitted(model1)
+res1<-resid(model1)
+plot(yhat,res1,main="predicted vs. residual")
+abline(0,0)
+
+# Check multicolliniearity
+vif(model1)
+
+# Retry model with centered predictors
+model2 <- lm(DASS~cBRIEF+ cSVK+cINTERACTION+Sex_num+Edu_num+Neu_num+Psy_num+Age,dataTN)
+summary(model2)
+vif(model2)
+
+# Check linearity
+crPlots(model1)
+crPlots(model2)
+
+# Check influential observations
+summary(influence.measures(model2))
+
+# Check normality of residuals
+ress<-rstandard(model1)            
+hist(ress,main="Histogram")
+qqnorm(ress)
+qqline(ress)
+
+ress<-rstandard(model2)            
+hist(ress,main="Histogram")
+qqnorm(ress)
+qqline(ress)
+
+# Conduct Logistic regression analysis
+# Transform DASS into dichotomous variable and perform logistic regression
+dataTN$dass <- cut(dataTN$DASS,breaks= c(0,3,55), include.lowest = TRUE, labels = c('low','high'))
+table(dataTN$dass)
+
+# Check assumptions for logistic regression
+logmodel <- glm(dass~BRIEF+ SVK+BRIEF*SVK +Sex_num+Edu_num+Neu_num+Psy_num+ Age,data =dataTN,family = binomial)
+summary(logmodel)
+
+# Check multicollinearity 
+vif(logmodel)
+
+# Use centered predictors
+clogmodel <- glm(dass~cBRIEF+ cSVK+ cINTERACTION+Sex_num+Edu_num+Neu_num+Psy_num+ Age,data =dataTN,family = binomial)
+summary(clogmodel)
+vif(clogmodel) 
+
+# Check linearity
+# Create interactions of continuous predictors with its log
+dataTN$logcBRIEF <- log(dataTN$cBRIEF)*dataTN$cBRIEF
+dataTN$logBRIEF <- log(dataTN$BRIEF+1)*(dataTN$BRIEF+1)
+dataTN$logSVK <- log(dataTN$SVK+1)*(dataTN$SVK+1)
+dataTN$logintera <- log((dataTN$SVK*dataTN$BRIEF)+1)*((dataTN$SVK*dataTN$BRIEF)+1)
+
+linealog <- glm(dass~BRIEF+ SVK+BRIEF*SVK+Sex_num+Edu_num+Neu_num+Psy_num+ Age +logSVK+logBRIEF+logintera,data =dataTN,family = binomial)
+summary(linealog)
+
+# Check linearity graphically
+# Add predicted values from the model
+probabilities <- predict(clogmodel, type = "response")
+
+# Create a data-frame without NA values, select the numeric continuous variables to plot
+nonadataTN <- dataTN %>% 
+  na.omit(dataTN)%>% 
+  select(Age,cBRIEF,cSVK,cINTERACTION)
+
+predictors <- colnames(nonadataTN)
+
+# Gather the predicted values across the predictor variables
+logit = log(probabilities/(1-probabilities))
+
+# Plot the logit values across predictor variables
+plot(logit,dataTN$BRIEF, ylab = 'BRIEF')
+plot(logit,dataTN$SVK, ylab = 'SVC')
+
+# Check influential observations
+summary(influence.measures(clogmodel))
+
+# Check whether different DASS split makes a difference in analysis
+# Transform DASS into dichotomous variable and perform logistic regression
+dataTN$dass <- cut(dataTN$DASS,breaks= c(0,0.5,55), include.lowest = TRUE, labels = c('low','high'))
+table(dataTN$dass)
+clogmodel2 <- glm(dass~cBRIEF+ cSVK+ cINTERACTION+Sex_num+Edu_num+Neu_num+Psy_num+ Age,data =dataTN,family = binomial)
+summary(clogmodel2)
+
+# Calculate effect size and CI
+clogmodel <- glm(dass~cBRIEF+ cSVK+ cINTERACTION+Sex_num+Edu_num+Neu_num+Psy_num+ Age,data =dataTN,family = binomial)
+summary(clogmodel)
+
+# 95% CI for coefficient
+exp(cbind(coef(clogmodel),confint(clogmodel)))
+exp(0.069370 + 2 * 0.010890)
+
+# Transform to log odds
+oddsratio<-exp(cbind("Odds ratio" = coef(clogmodel), confint.default(clogmodel, level = 0.95)))
+round(oddsratio,digits=3)
+
+# Calculate to odds ratio
+oddsratio1<-exp(cbind("Odds ratio" = coef(clogmodel)))
+round(oddsratio1,digits=3)
+
+# Correlation matrix
+cordata <- dataTN %>%
+  select(BRIEF, SVK, DASS, Age)
+cor(cordata, use = 'complete.obs')
+
+# Calculate sensitivity of analysis
+pwr.f2.test(u = 8, v = 326, sig.level = .05, power = .8 )
