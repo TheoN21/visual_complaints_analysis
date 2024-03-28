@@ -68,7 +68,9 @@ Outline potential future work that can be done to extend the project or improve 
 4. etc...
 
 
+## License
 
+Specify the license under which your code is released. Moreover, provide the licenses associated with the dataset you are using. This is important for others to know if they want to use or contribute to your project.
 
 
 
