@@ -51,8 +51,7 @@ Provide an overview of the results of your project, including any relevant metri
 PDF of my [report]()
 
 ## Reference
-Original dataset: 
-
+#### Original dataset: 
 Huizinga, F.; Heutink, J.; de Haan G.A.; van der Lijn, I; van der Feen, F.E.; Vrijling, A.C.L.; Melis-Dankers, B.J.M.; de Vries, S.M.; Tucha, O.M.; Koerts, J., 2019, "Replication Data for: “The development of the Screening of Visual Complaints questionnaire for patients with neurodegenerative disorders: evaluation of psychometric features in a community sample”", https://doi.org/10.34894/CMJXAK, DataverseNL, V1 
 
 ## License 
