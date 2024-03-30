@@ -16,7 +16,6 @@ library(faraway)
 library(broom)
 
 
-
 # Reading in the data
 dataTN <- read.csv("dataTN.Rdata", 
                        header = TRUE, 
@@ -90,9 +89,7 @@ sd(dataTN$SVK,na.rm= T)
 mean(dataTN$Edu_num, na.rm= T)
 median(dataTN$Edu_num,na.rm= T)
 sd(dataTN$Edu_num,na.rm= T)
-
 # Difference between robust measures and non-robust measures small
-
 
 # Simple bivariate analysis
 # Correlations continuous variables
