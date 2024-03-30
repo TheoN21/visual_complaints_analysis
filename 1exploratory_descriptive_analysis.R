@@ -30,9 +30,9 @@ pie(table(dataTN$Neuf))
 pie(table(dataTN$Psyf))
 
 hist(table(dataTN$Age),main = 'Age', xlab = 'Age')
-hist(table(dataTN$BRIEF), main = 'BRIEF',xlab = 'BRIEF', ylab = 'Frequency', col = 'lightblue',axisnames =  TRUE)  
-hist(table(dataTN$DASS),main = 'DASS',xlab = 'DASS', ylab = 'Frequency', col = 'orangered' ,axisnames =  TRUE)   
-hist(table(dataTN$SVK),main = 'SVC',xlab = 'SVC', ylab = 'Frequency', col = 'lightgreen',axisnames =  TRUE )    
+hist(table(dataTN$BRIEF), main = 'BRIEF',xlab = 'BRIEF',  col = 'lightblue',axisnames =  TRUE)  
+hist(table(dataTN$DASS),main = 'DASS',xlab = 'DASS',  col = 'orangered' ,axisnames =  TRUE)   
+hist(table(dataTN$SVK),main = 'SVC',xlab = 'SVC',  col = 'lightgreen',axisnames =  TRUE )    
 
 boxplot(dataTN$Age)
 boxplot(dataTN$BRIEF)
