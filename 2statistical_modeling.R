@@ -2,7 +2,7 @@
 #Project for Applied Statistics Course
 # Author: Theodor Nowicki
 # Finish date: 5.04.2022
-# Script: Data Modeling
+# Script: Statistical Modeling
 # ---------------------------------------------------------------------------------
 
 library(foreign)
@@ -18,7 +18,7 @@ library(pwr)
 
 
 # Reading in the data
-data_total <- read.csv("dataTN.Rdata", 
+dataTN <- read.csv("dataTN.Rdata", 
                        header = TRUE, 
                        sep = ";")
 
