@@ -92,6 +92,10 @@ dataTN <- dataTN %>%
   mutate(na_Edu = as.numeric(is.na(Edu_num)), 
          na_BRIEF = as.numeric(is.na(BRIEF)),na_DASS = as.numeric(is.na(DASS))) 
 
+pie(table(dataTN$na_BRIEF))
+pie(table(dataTN$na_Edu))
+pie(table(dataTN$na_DASS))
+
 # Check pattern of NA regarding control variable
 # First check visually
 ggboxplot(dataTN, x = "na_BRIEF", y = "Age", 
@@ -181,6 +185,4 @@ print(chi7)
 # Calculate effect size for test
 wsqr = Xsqr/N
 w = sqrt(333.79/400)
-pie(table(dataTN$na_BRIEF))
-pie(table(dataTN$na_Edu))
-pie(table(dataTN$na_DASS))
+
