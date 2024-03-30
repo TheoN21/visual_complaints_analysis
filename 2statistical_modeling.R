@@ -27,8 +27,8 @@ model1 <- lm(DASS~BRIEF+ SVK+BRIEF*SVK+Sex_num+Edu_num+Neu_num+Psy_num+Age,dataT
 summary(model1)
 yhat<-fitted(model1)
 res1<-resid(model1)
-plot(yhat,res1,main="predicted vs. residual")
-abline(0,0)
+plot(yhat,res1,main="Predicted vs. Residual", xlab = 'Predicted', ylab= 'Residuals')
+abline(0,0, col= 'red')
 
 # Check multicolliniearity
 vif(model1)
