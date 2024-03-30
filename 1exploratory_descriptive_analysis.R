@@ -34,10 +34,10 @@ hist(table(dataTN$BRIEF), main = 'BRIEF',xlab = 'BRIEF',  col = 'lightblue')
 hist(table(dataTN$DASS),main = 'DASS',xlab = 'DASS',  col = 'orangered' )   
 hist(table(dataTN$SVK),main = 'SVC',xlab = 'SVC',  col = 'lightgreen' )    
 
-boxplot(dataTN$Age)
-boxplot(dataTN$BRIEF)
-boxplot(dataTN$DASS)
-boxplot(dataTN$SVK)
+boxplot(dataTN$Age, main = 'Age')
+boxplot(dataTN$BRIEF, main = 'BRIEF', col = 'lightblue')
+boxplot(dataTN$DASS,main = 'DASS', col = 'orangered' )
+boxplot(dataTN$SVK,main = 'SVC', col = 'lightgreen')
 
 # Winsorized variance and mean
 # Download from: http://dornsife.usc.edu/labs/rwilcox/software/
