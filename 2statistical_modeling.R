@@ -18,9 +18,7 @@ library(pwr)
 
 
 # Reading in the data
-dataTN <- read.csv("dataTN.Rdata", 
-                       header = TRUE, 
-                       sep = ";")
+load("dataTN.rdata")
 
 
 # Diagnostics for multiple regression model
