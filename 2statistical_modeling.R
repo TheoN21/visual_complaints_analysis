@@ -36,12 +36,10 @@ abline(0,0)
 vif(model1)
 
 # Retry model with centered predictors
-
 # Center predictors
 dataTN$cBRIEF<- scale(dataTN$BRIEF,scale = FALSE)
 dataTN$cSVK<- scale(dataTN$SVK,scale = FALSE)
 dataTN$cINTERACTION <- dataTN$cSVK*dataTN$cBRIEF
-
 
 model2 <- lm(DASS~cBRIEF+ cSVK+cINTERACTION+Sex_num+Edu_num+Neu_num+Psy_num+Age, dataTN)
 summary(model2)
@@ -67,7 +65,6 @@ qqline(ress, col= 'red')
 
 
 # Conduct Logistic regression analysis due to violations of Linearity, Normality and Homoscedasticity
-
 # Transform DASS into dichotomous variable and perform logistic regression
 dataTN$dass <- cut(dataTN$DASS,breaks= c(0,3,55), include.lowest = TRUE, labels = c('low','high'))
 table(dataTN$dass)
@@ -91,7 +88,7 @@ dataTN <- dataTN %>%
 logmodel <- glm(dass~BRIEF+ SVK+interaction +Sex_num+Edu_num+Neu_num+Psy_num+ Age,data =dataTN,family = binomial, na.action = na.exclude)
 summary(logmodel)
 
-# Create component + residual plot
+# Create component + residual plots
 dataTN %>%
   mutate(comp_res = coef(logmodel)["BRIEF"]*BRIEF + residuals(logmodel, type = "working")) |> 
   ggplot(aes(x = BRIEF, y = comp_res)) +
