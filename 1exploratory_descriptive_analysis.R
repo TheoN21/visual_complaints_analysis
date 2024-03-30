@@ -14,7 +14,7 @@ library(rcompanion)
 library(psych)
 library(faraway)
 library(broom)
-library(pwr)
+
 
 
 # Reading in the data
