@@ -16,8 +16,6 @@ library(faraway)
 library(broom)
 
 
-
-
 # Reading in the data
 data_total <- read.csv("Data_total.csv", 
                        header = TRUE, 
