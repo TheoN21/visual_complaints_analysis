@@ -113,7 +113,7 @@ ggboxplot(dataTN, x = "Neuf", y = "BRIEF",
 
 ggboxplot(dataTN, x = "Neuf", y = "SVK", 
           color = "Neuf", palette = c("#00AFBB", "#E7B800"),
-          ylab = "visual complains", xlab = "Neurologist")          
+          ylab = "Visual complains", xlab = "Neurologist")          
 
 ggboxplot(dataTN, x = "Psyf", y = "BRIEF", 
           color = "Psyf", palette = c("#00AFBB", "#E7B800"),    
@@ -122,6 +122,18 @@ ggboxplot(dataTN, x = "Psyf", y = "BRIEF",
 ggboxplot(dataTN, x = "Psyf", y = "SVK", 
           color = "Psyf", palette = c("#00AFBB", "#E7B800"),    
           ylab = "Visual complaints", xlab = "Psychologist")       
+
+
+# With dependent variable
+
+ggboxplot(dataTN, x = "Sexf", y = "DASS", 
+          color = "Sexf", palette = c("#00AFBB", "#E7B800"),
+          ylab = "Depression and Anxiety", xlab = "Sex")
+
+ggboxplot(dataTN, x = "Neuf", y = "DASS", 
+          color = "Neuf", palette = c("#00AFBB", "#E7B800"),
+          ylab = "Depression and Anxiety", xlab = "Neurologist")
+
 
 ggboxplot(dataTN, x = "Psyf", y = "DASS", 
           color = "Psyf", palette = c("#00AFBB", "#E7B800"),    
