@@ -26,8 +26,8 @@ summary(dataTN)
 
 pie(table(dataTN$Sexf), main = 'Sex', col = c('lightskyblue1','pink1'))    
 pie(table(dataTN$Eduf), main = 'Level of Education',clockwise = TRUE, col = c('gray95','lightsteelblue2','dodgerblue1'))     
-pie(table(dataTN$Neuf), main = 'Visit to Neurologist', col = c('gray95','darkseagreen1'))     
-pie(table(dataTN$Psyf), main = 'Visit to Psychologist', col = c('gray95','lightblue1'))
+pie(table(dataTN$Neuf), main = 'Visit to Neurologist', col = c('gray96','darkseagreen1'))     
+pie(table(dataTN$Psyf), main = 'Visit to Psychologist', col = c('gray96','lightblue1'))
 
 hist(table(dataTN$Age),main = 'Age', xlab = 'Age')
 hist(table(dataTN$BRIEF), main = 'BRIEF',xlab = 'BRIEF',  col = 'lightblue')  
