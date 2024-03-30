@@ -17,9 +17,7 @@ library(broom)
 
 
 # Reading in the data
-dataTN <- read.csv("dataTN.Rdata", 
-                       header = TRUE, 
-                       sep = ";")
+load("dataTN.rdata")
 
 
 # Descriptive analysis
