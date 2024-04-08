@@ -36,6 +36,7 @@ Original data [Data_total.csv](https://github.com/TheoN21/visual_complaints_mode
 - Changing data types
 - Assessing missing data
 - Checking for outliers
+- Data transformation  
   
 Cleaned data [dataTN](https://github.com/TheoN21/visual_complaints_moderation/blob/main/data/dataTN.Rdata)
 
@@ -46,9 +47,9 @@ Cleaned data [dataTN](https://github.com/TheoN21/visual_complaints_moderation/bl
 4. Statistical modeling and data analysis script is being kept [here](https://github.com/TheoN21/visual_complaints_moderation/blob/main/2statistical_modeling.R)
 
 ## Results and evaluation
-Provide an overview of the results of your project, including any relevant metrics and graphs. Include explanations of any evaluation methodologies and how they were used to assess the quality of the model. You can also make it appealing by including any pictures of your analysis or visualizations.
+The results did not support my hypothesis that visual complaints moderate the relationship between executive function deficits and the amount of anxiety and depression symptoms. Nonetheless, experiencing visual complaints, as well as executive functions deficits on their own were found to increase the likelihood of having more anxiety and depressive symptoms in the dataset used in this report. 
 
-PDF of my [report]()
+PDF of my [report](https://github.com/TheoN21/visual_complaints_analysis/blob/main/Report%20T.%20Nowicki.pdf)
 
 ## Reference
 #### Original dataset: 
